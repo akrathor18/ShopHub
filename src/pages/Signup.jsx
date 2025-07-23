@@ -1,10 +1,10 @@
-"use client"
-
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useForm } from "react-hook-form"
 import { User, Mail, Lock, Phone, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react"
-import { registerUser, isValidEmail, isValidPassword, userExists } from "../utils/auth"
+import { registerUser } from "../utils/auth"
 import { useApp } from "../App"
+import { validationRules, checkUserExists } from "../utils/validation"
 
 export default function Signup() {
   const navigate = useNavigate()
@@ -12,97 +12,52 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  })
-  const [errors, setErrors] = useState({})
   const [success, setSuccess] = useState(false)
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+    setError,
+    clearErrors,
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      agreeToTerms: false,
+    },
+  })
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }))
-    }
-  }
+  const password = watch("password")
 
-  const validateForm = () => {
-    const newErrors = {}
-
-    // Required fields
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required"
-    }
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required"
-    }
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!isValidEmail(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
-    } else if (userExists(formData.email)) {
-      newErrors.email = "An account with this email already exists"
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required"
-    } else if (formData.phone.length < 10) {
-      newErrors.phone = "Please enter a valid phone number"
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required"
-    } else if (!isValidPassword(formData.password)) {
-      newErrors.password = "Password must be at least 6 characters long"
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password"
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
-    }
-
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "You must agree to the terms and conditions"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
+  const onSubmit = async (data) => {
     setIsLoading(true)
+    clearErrors()
 
     try {
+      // Check if user already exists
+      const userExistsResult = await checkUserExists(data.email)
+      if (userExistsResult !== true) {
+        setError("email", { type: "manual", message: userExistsResult })
+        setIsLoading(false)
+        return
+      }
+
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
       const newUser = registerUser({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
       })
 
       setSuccess(true)
@@ -121,7 +76,7 @@ export default function Signup() {
         navigate("/")
       }, 2000)
     } catch (error) {
-      setErrors({ submit: error.message })
+      setError("root", { type: "manual", message: error.message })
     } finally {
       setIsLoading(false)
     }
@@ -167,36 +122,32 @@ export default function Signup() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
             {/* Name Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
                 <input
                   type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
+                  {...register("firstName", validationRules.firstName)}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.firstName ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter first name"
                 />
-                {errors.firstName && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.firstName}</p>}
+                {errors.firstName && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.firstName.message}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
                 <input
                   type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
+                  {...register("lastName", validationRules.lastName)}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.lastName ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter last name"
                 />
-                {errors.lastName && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.lastName}</p>}
+                {errors.lastName && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.lastName.message}</p>}
               </div>
             </div>
 
@@ -206,9 +157,7 @@ export default function Signup() {
               <div className="relative">
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  {...register("email", validationRules.email)}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.email ? "border-red-500" : "border-gray-300"
                   }`}
@@ -216,7 +165,7 @@ export default function Signup() {
                 />
                 <Mail className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
-              {errors.email && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email.message}</p>}
             </div>
 
             {/* Phone */}
@@ -225,17 +174,16 @@ export default function Signup() {
               <div className="relative">
                 <input
                   type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
+                  {...register("phone", validationRules.phone)}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.phone ? "border-red-500" : "border-gray-300"
                   }`}
-                  placeholder="Enter your phone number"
+                  placeholder="Enter 10-digit mobile number"
                 />
                 <Phone className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
-              {errors.phone && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.phone}</p>}
+              {errors.phone && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.phone.message}</p>}
+              <p className="text-gray-500 text-xs sm:text-sm mt-1">Enter a valid Indian mobile number (10 digits)</p>
             </div>
 
             {/* Password */}
@@ -244,9 +192,7 @@ export default function Signup() {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
+                  {...register("password", validationRules.password)}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.password ? "border-red-500" : "border-gray-300"
                   }`}
@@ -265,7 +211,7 @@ export default function Signup() {
                   )}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.password.message}</p>}
               <p className="text-gray-500 text-xs sm:text-sm mt-1">Password must be at least 6 characters long</p>
             </div>
 
@@ -275,9 +221,7 @@ export default function Signup() {
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
+                  {...register("confirmPassword", validationRules.confirmPassword(password))}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.confirmPassword ? "border-red-500" : "border-gray-300"
                   }`}
@@ -297,7 +241,7 @@ export default function Signup() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.confirmPassword}</p>
+                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -306,9 +250,9 @@ export default function Signup() {
               <label className="flex items-start text-sm sm:text-base">
                 <input
                   type="checkbox"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleInputChange}
+                  {...register("agreeToTerms", {
+                    required: "You must agree to the terms and conditions",
+                  })}
                   className={`mt-1 mr-3 ${errors.agreeToTerms ? "border-red-500" : ""}`}
                 />
                 <span className="text-gray-700">
@@ -322,20 +266,22 @@ export default function Signup() {
                   </Link>
                 </span>
               </label>
-              {errors.agreeToTerms && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.agreeToTerms}</p>}
+              {errors.agreeToTerms && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.agreeToTerms.message}</p>
+              )}
             </div>
 
             {/* Submit Error */}
-            {errors.submit && (
+            {errors.root && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
-                <p className="text-red-600 text-xs sm:text-sm">{errors.submit}</p>
+                <p className="text-red-600 text-xs sm:text-sm">{errors.root.message}</p>
               </div>
             )}
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !isValid}
               className="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center text-sm sm:text-base"
             >
               {isLoading ? (

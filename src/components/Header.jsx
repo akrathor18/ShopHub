@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link,NavLink, useNavigate } from "react-router-dom"
 import { ShoppingCart, Search, Menu, X, User, Heart } from "lucide-react"
 import { useApp } from "../App"
 
@@ -16,34 +16,41 @@ export default function Header() {
     }
   }
 
+  const navLinks= [
+    { to: "/", label: "Home" },
+    { to: "/products", label: "Products" },
+    { to: "/cart", label: "Cart" },
+    { to: "/categories", label: "Categories" },
+    { to: "/contact", label: "Contact" },
+  ]
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+            <Link to="/" className="text-xl sm:text-3xl font-bold text-blue-600 transition-colors">
               Shophub
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex space-x-6 xl:space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-gray-900 transition-colors text-sm xl:text-base">
-              Home
-            </Link>
-            <Link to="/products" className="text-gray-700 hover:text-gray-900 transition-colors text-sm xl:text-base">
-              Products
-            </Link>
-            <Link to="/cart" className="text-gray-700 hover:text-gray-900 transition-colors text-sm xl:text-base">
-              Cart
-            </Link>
-            <Link to="/categories" className="text-gray-700 hover:text-gray-900 transition-colors text-sm xl:text-base">
-              Categories
-            </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-gray-900 transition-colors text-sm xl:text-base">
-              Contact
-            </Link>
+            {navLinks.map((link) => ( 
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  ` hover:text-gray-900 transition-colors text-m font-bold xl:text-base ${isActive ? "text-blue-600" : "text-gray-700"}`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))
+
+            }
+          
           </nav>
 
           {/* Search and Actions */}

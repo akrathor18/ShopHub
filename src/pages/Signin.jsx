@@ -1,10 +1,10 @@
-"use client"
-
 import { useState } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useForm } from "react-hook-form"
 import { User, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react"
-import { loginUser, isValidEmail } from "../utils/auth"
+import { loginUser } from "../utils/auth"
 import { useApp } from "../App"
+import { validationRules } from "../utils/validation"
 
 export default function Signin() {
   const navigate = useNavigate()
@@ -12,69 +12,41 @@ export default function Signin() {
   const { setUser } = useApp()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    rememberMe: true,
-  })
-  const [errors, setErrors] = useState({})
 
   // Get the redirect path from location state, default to home
   const from = location.state?.from?.pathname || "/"
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    setError,
+    clearErrors,
+    setValue,
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
+  })
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }))
-    }
-  }
-
-  const validateForm = () => {
-    const newErrors = {}
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!isValidEmail(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
+  const onSubmit = async (data) => {
     setIsLoading(true)
+    clearErrors()
 
     try {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      const user = loginUser(formData.email, formData.password)
+      const user = loginUser(data.email, data.password)
       setUser(user)
 
       // Redirect to the intended page or home
       navigate(from, { replace: true })
     } catch (error) {
-      setErrors({ submit: error.message })
+      setError("root", { type: "manual", message: error.message })
     } finally {
       setIsLoading(false)
     }
@@ -83,14 +55,12 @@ export default function Signin() {
   // Demo accounts for testing
   const demoAccounts = [
     { email: "demo@shophub.com", password: "demo123", name: "Demo User" },
+    { email: "john@example.com", password: "password", name: "John Doe" },
   ]
 
   const handleDemoLogin = async (demoAccount) => {
-    setFormData({
-      email: demoAccount.email,
-      password: demoAccount.password,
-      rememberMe: false,
-    })
+    setValue("email", demoAccount.email)
+    setValue("password", demoAccount.password)
 
     setIsLoading(true)
     try {
@@ -106,14 +76,14 @@ export default function Signin() {
           firstName: demoAccount.name.split(" ")[0],
           lastName: demoAccount.name.split(" ")[1] || "",
           email: demoAccount.email,
-          phone: "1234567890",
+          phone: "9876543210",
           password: demoAccount.password,
         })
         const user = loginUser(demoAccount.email, demoAccount.password)
         setUser(user)
         navigate(from, { replace: true })
       } catch (createError) {
-        setErrors({ submit: "Demo account setup failed" })
+        setError("root", { type: "manual", message: "Demo account setup failed" })
       }
     } finally {
       setIsLoading(false)
@@ -158,16 +128,14 @@ export default function Signin() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
               <div className="relative">
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  {...register("email", validationRules.email)}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.email ? "border-red-500" : "border-gray-300"
                   }`}
@@ -175,18 +143,16 @@ export default function Signin() {
                 />
                 <Mail className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
-              {errors.email && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email.message}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
+                  {...register("password", validationRules.password)}
                   className={`w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 border rounded-lg focus:outline-none focus:border-blue-500 text-sm sm:text-base ${
                     errors.password ? "border-red-500" : "border-gray-300"
                   }`}
@@ -205,19 +171,13 @@ export default function Signin() {
                   )}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.password.message}</p>}
             </div>
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <label className="flex items-center text-sm sm:text-base">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
+                <input type="checkbox" {...register("rememberMe")} className="mr-2" />
                 <span className="text-gray-700">Remember me</span>
               </label>
               <Link to="/forgot-password" className="text-blue-600 hover:text-blue-700 text-sm sm:text-base">
@@ -226,16 +186,16 @@ export default function Signin() {
             </div>
 
             {/* Submit Error */}
-            {errors.submit && (
+            {errors.root && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
-                <p className="text-red-600 text-xs sm:text-sm">{errors.submit}</p>
+                <p className="text-red-600 text-xs sm:text-sm">{errors.root.message}</p>
               </div>
             )}
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !isValid}
               className="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center text-sm sm:text-base"
             >
               {isLoading ? (

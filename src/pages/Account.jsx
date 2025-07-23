@@ -1,7 +1,6 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { User, Package, Settings, LogOut, Edit } from "lucide-react"
+import { Link } from "react-router-dom"
 import { useApp } from "../App"
 import { formatPrice } from "../utils/currency"
 import { getOrders } from "../utils/localStorage"
@@ -89,18 +88,18 @@ export default function Account() {
           </div>
 
           <div className="space-y-3">
-            <a
+            <Link
               href="/signin"
               className="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center block text-sm sm:text-base"
             >
               Sign In
-            </a>
-            <a
+            </Link>
+            <Link
               href="/signup"
               className="w-full border border-gray-300 text-gray-700 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center block text-sm sm:text-base"
             >
               Create Account
-            </a>
+            </Link>
           </div>
         </div>
       </div>

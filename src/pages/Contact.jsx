@@ -1,38 +1,45 @@
-"use client"
-
 import { useState } from "react"
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from "lucide-react"
+import { validationRules } from "../utils/validation"
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  })
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const onSubmit = async (data) => {
     setIsSubmitting(true)
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      // Simulate form submission
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    setIsSubmitting(false)
-    setIsSubmitted(true)
-    setFormData({ name: "", email: "", subject: "", message: "" })
+      console.log("Contact form submitted:", data)
+      setIsSubmitted(true)
+      reset()
 
-    // Reset success message after 3 seconds
-    setTimeout(() => setIsSubmitted(false), 3000)
+      // Reset success message after 5 seconds
+      setTimeout(() => setIsSubmitted(false), 5000)
+    } catch (error) {
+      console.error("Form submission error:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -70,8 +77,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
-                    <p className="text-gray-600">+1 (555) 987-6543</p>
+                    <p className="text-gray-600">+91 98765 43210</p>
+                    <p className="text-gray-600">+91 87654 32109</p>
                   </div>
                 </div>
 
@@ -84,9 +91,9 @@ export default function Contact() {
                     <p className="text-gray-600">
                       123 Tech Street
                       <br />
-                      San Francisco, CA 94105
+                      Mumbai, Maharashtra 400001
                       <br />
-                      United States
+                      India
                     </p>
                   </div>
                 </div>
@@ -116,12 +123,13 @@ export default function Contact() {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
 
               {isSubmitted && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                  Thank you for your message! We'll get back to you soon.
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+                  <p className="text-green-700">Thank you for your message! We'll get back to you soon.</p>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -130,13 +138,23 @@ export default function Contact() {
                     <input
                       type="text"
                       id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                      {...register("name", {
+                        required: "Full name is required",
+                        minLength: {
+                          value: 2,
+                          message: "Name must be at least 2 characters",
+                        },
+                        pattern: {
+                          value: /^[A-Za-z\s]+$/,
+                          message: "Name can only contain letters and spaces",
+                        },
+                      })}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 transition-colors ${
+                        errors.name ? "border-red-500" : "border-gray-300"
+                      }`}
                       placeholder="Your full name"
                     />
+                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -145,13 +163,13 @@ export default function Contact() {
                     <input
                       type="email"
                       id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                      {...register("email", validationRules.email)}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 transition-colors ${
+                        errors.email ? "border-red-500" : "border-gray-300"
+                      }`}
                       placeholder="your.email@example.com"
                     />
+                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
                   </div>
                 </div>
 
@@ -162,13 +180,13 @@ export default function Contact() {
                   <input
                     type="text"
                     id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                    {...register("subject", validationRules.subject)}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 transition-colors ${
+                      errors.subject ? "border-red-500" : "border-gray-300"
+                    }`}
                     placeholder="What is this regarding?"
                   />
+                  {errors.subject && <p className="text-red-500 text-sm mt-1">{errors.subject.message}</p>}
                 </div>
 
                 <div>
@@ -177,19 +195,20 @@ export default function Contact() {
                   </label>
                   <textarea
                     id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
+                    {...register("message", validationRules.message)}
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-blue-500 transition-colors resize-none ${
+                      errors.message ? "border-red-500" : "border-gray-300"
+                    }`}
                     placeholder="Please describe your inquiry in detail..."
                   />
+                  {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>}
+                  <p className="text-gray-500 text-sm mt-1">Minimum 20 characters required</p>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                   className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   {isSubmitting ? (
@@ -230,7 +249,7 @@ export default function Contact() {
               },
               {
                 question: "Do you offer international shipping?",
-                answer: "Yes, we ship to most countries worldwide. Shipping costs and delivery times vary by location.",
+                answer: "Currently, we only ship within India. International shipping will be available soon.",
               },
               {
                 question: "How can I track my order?",
