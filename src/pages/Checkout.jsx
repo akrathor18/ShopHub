@@ -489,11 +489,11 @@ export default function Checkout() {
               </div>
 
               <div className="border-t pt-4 space-y-2 text-sm sm:text-base">
-                <div className="flex justify-between">
+                <div className="flex justify-between bg-gray-100 p-2 rounded-lg">
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between bg-gray-100 p-2 rounded-lg text-green-400">
                   <span>Shipping</span>
                   <span>{shipping === 0 ? "Free" : formatPrice(shipping)}</span>
                 </div>
@@ -507,7 +507,7 @@ export default function Checkout() {
                     <span>Free</span>
                   </div>
                 )}
-                <div className=" text-green-600 border-t pt-2 flex justify-between font-semibold text-base sm:text-lg">
+                <div className=" text-green-600  border-t pt-2 flex justify-between font-semibold text-base sm:text-lg">
                   <span>Total</span>
                   <span>{formatPrice(total)}</span>
                 </div>

@@ -7,6 +7,29 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
+# Firebase cache and settings
+.firebase/
+firestore.indexes.json
+firestore.rules
+storage.rules
+firebase-debug.log
+firebase.json
+
+# Production build
+dist/
+
+
+# Vite cache
+.vite/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 

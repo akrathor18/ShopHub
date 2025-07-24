@@ -89,13 +89,13 @@ export default function Account() {
 
           <div className="space-y-3">
             <Link
-              href="/signin"
+              to="/signin"
               className="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center block text-sm sm:text-base"
             >
               Sign In
             </Link>
             <Link
-              href="/signup"
+              to  ="/signup"
               className="w-full border border-gray-300 text-gray-700 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center block text-sm sm:text-base"
             >
               Create Account

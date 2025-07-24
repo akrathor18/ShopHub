@@ -51,9 +51,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link to="/contact#FAQ" className="hover:text-white transition-colors">
                   FAQ
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

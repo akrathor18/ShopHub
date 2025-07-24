@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link,NavLink, useNavigate } from "react-router-dom"
+import { Link, NavLink, useNavigate } from "react-router-dom"
 import { ShoppingCart, Search, Menu, X, User, Heart } from "lucide-react"
 import { useApp } from "../App"
 
@@ -16,7 +16,7 @@ export default function Header() {
     }
   }
 
-  const navLinks= [
+  const navLinks = [
     { to: "/", label: "Home" },
     { to: "/products", label: "Products" },
     { to: "/cart", label: "Cart" },
@@ -37,7 +37,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex space-x-6 xl:space-x-8">
-            {navLinks.map((link) => ( 
+            {navLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -50,7 +50,7 @@ export default function Header() {
             ))
 
             }
-          
+
           </nav>
 
           {/* Search and Actions */}
@@ -115,58 +115,63 @@ export default function Header() {
               />
             </form>
             <nav className="flex flex-col space-y-2">
-              <Link to="/" className="text-gray-700 hover:text-gray-900 py-2 px-2" onClick={() => setIsMenuOpen(false)}>
+              <NavLink to="/" className={({ isActive }) =>
+                `py-2 px-2 ${isActive ? "text-blue-600 bg-gray-100 p-2 rounded-lg" : "text-gray-700"}`
+              } onClick={() => setIsMenuOpen(false)}>
                 Home
-              </Link>
-              <Link
-                to="/products"
-                className="text-gray-700 hover:text-gray-900 py-2 px-2"
+              </NavLink>
+              <NavLink
+                to="/products" className={({ isActive }) =>
+                  `py-2 px-2 ${isActive ? "text-blue-600 bg-gray-100 p-2 rounded-lg" : "text-gray-700"}`
+                }
                 onClick={() => setIsMenuOpen(false)}
               >
                 Products
-              </Link>
-              <Link
-                to="/categories"
-                className="text-gray-700 hover:text-gray-900 py-2 px-2"
+              </NavLink>
+              <NavLink
+                to="/categories" className={({ isActive }) =>
+                  `py-2 px-2 ${isActive ? "text-blue-600 bg-gray-100 p-2 rounded-lg" : "text-gray-700"}`
+                }
                 onClick={() => setIsMenuOpen(false)}
               >
                 Categories
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/cart"
-                className="text-gray-700 hover:text-gray-900 py-2 px-2"
+                className={({ isActive }) =>
+                  `py-2 px-2 ${isActive ? "text-blue-600 bg-gray-100 p-2 rounded-lg" : "text-gray-700"}`
+                }
                 onClick={() => setIsMenuOpen(false)}
               >
                 Cart ({getTotalItems()})
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/wishlist"
-                className="text-gray-700 hover:text-gray-900 py-2 px-2 sm:hidden"
+                className={({ isActive }) =>
+                  `py-2 px-2 ${isActive ? "text-blue-600 bg-gray-100 p-2 rounded-lg" : "text-gray-700"}`
+                }
                 onClick={() => setIsMenuOpen(false)}
               >
                 Wishlist ({wishlist.length})
-              </Link>
-              <Link
-                to="/about"
-                className="text-gray-700 hover:text-gray-900 py-2 px-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/contact"
-                className="text-gray-700 hover:text-gray-900 py-2 px-2"
+                className={({ isActive }) =>
+                  `py-2 px-2 ${isActive ? "text-blue-600 bg-gray-100 p-2 rounded-lg" : "text-gray-700"}`
+                }
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/account"
-                className="text-gray-700 hover:text-gray-900 py-2 px-2 sm:hidden"
+                className={({ isActive }) =>
+                  `py-2 px-2 ${isActive ? "text-blue-600 bg-gray-100 p-2 rounded-lg" : "text-gray-700"}`
+                }
                 onClick={() => setIsMenuOpen(false)}
               >
                 Account
-              </Link>
+              </NavLink>
             </nav>
           </div>
         )}

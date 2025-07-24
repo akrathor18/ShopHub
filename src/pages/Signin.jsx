@@ -55,7 +55,6 @@ export default function Signin() {
   // Demo accounts for testing
   const demoAccounts = [
     { email: "demo@shophub.com", password: "demo123", name: "Demo User" },
-    { email: "john@example.com", password: "password", name: "John Doe" },
   ]
 
   const handleDemoLogin = async (demoAccount) => {

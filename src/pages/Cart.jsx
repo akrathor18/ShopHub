@@ -149,15 +149,15 @@ export default function Cart() {
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
 
               <div className="space-y-4 mb-6">
-                <div className="flex justify-between text-sm sm:text-base">
+                <div className="flex justify-between text-sm sm:text-base bg-gray-100 p-2 rounded-lg">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-medium">{formatPrice(getTotalPrice())}</span>
                 </div>
-                <div className="flex justify-between text-sm sm:text-base">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">{getTotalPrice() > 4000 ? "Free" : formatPrice(829)}</span>
+                <div className="flex justify-between text-sm sm:text-base bg-gray-100 p-2 rounded-lg">
+                  <span className={`text-gray-600`}>Shipping</span>
+                  <span className={`${getTotalPrice() > 4000 ? "text-green-400" :"text-red-500" }`}>{getTotalPrice() > 4000 ? "Free" : formatPrice(829)}</span>
                 </div>
-                <div className="flex justify-between text-sm sm:text-base">
+                <div className="flex justify-between text-sm sm:text-base text-red-400 bg-gray-100 p-2 rounded-lg">
                   <span className="text-gray-600">GST (18%)</span>
                   <span className="font-medium">{formatPrice(Math.round(getTotalPrice() * 0.18))}</span>
                 </div>

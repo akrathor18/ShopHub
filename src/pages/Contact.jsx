@@ -89,9 +89,9 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Address</h3>
                     <p className="text-gray-600">
-                      123 Tech Street
+                      123 Tech 
                       <br />
-                      Mumbai, Maharashtra 400001
+                      Cahndigarh, 160000
                       <br />
                       India
                     </p>
@@ -229,7 +229,7 @@ export default function Contact() {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-16">
+        <div id="FAQ" className="mt-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
             <p className="text-gray-600">Quick answers to common questions</p>
