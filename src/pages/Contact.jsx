@@ -91,7 +91,7 @@ export default function Contact() {
                     <p className="text-gray-600">
                       123 Tech 
                       <br />
-                      Cahndigarh, 160000
+                      Chandigarh, 160000
                       <br />
                       India
                     </p>
