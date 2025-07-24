@@ -34,8 +34,13 @@ Live Demo 👉 [https://shophub-dev.web.app](https://shophub-dev.web.app)
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/your-username/shophub.git](https://github.com/akrathor18/ShopHub.git
-   cd shophub
-2. **Run on local host**
+      git clone https://github.com/your-username/shophub.git](https://github.com/akrathor18/ShopHub.git
+      cd shophub
+
+  2. **Install dependencies**
+ ```bash
+    npm install
+```
+3. **Rum on Local Host**
    ```bash
    npm run dev
